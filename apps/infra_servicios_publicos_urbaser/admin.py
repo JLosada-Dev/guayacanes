@@ -2,7 +2,7 @@ from django.contrib.gis import admin
 from .models import (
     Complaint, Evidence,
     SweepingMacroRoute, SweepingMicroRoute,
-    GreenZone, CuttingSchedule, Intervention,
+    GreenZoneAssignment, CuttingSchedule, Intervention,
     SLAAlert, CommuneMetric,
     ServiceContent, AspectContent,
 )
@@ -95,29 +95,29 @@ class InterventionInline(admin.TabularInline):
     fields = ['execution_date', 'intervention_type', 'recorded_by', 'notes']
 
 
-@admin.register(GreenZone)
-class GreenZoneAdmin(admin.GISModelAdmin):
-    list_display  = ['external_id', 'name', 'zone_type', 'area_sqm', 'cycle_days', 'active']
-    list_filter   = ['zone_type', 'active']
-    search_fields = ['name', 'external_id']
-    ordering      = ['name']
+@admin.register(GreenZoneAssignment)
+class GreenZoneAssignmentAdmin(admin.ModelAdmin):
+    list_display  = ['external_id', 'public_space_name', 'public_space_id', 'cycle_days', 'active']
+    list_filter   = ['active']
+    search_fields = ['public_space_name', 'external_id', 'public_space_id']
+    ordering      = ['external_id']
     inlines       = [CuttingScheduleInline, InterventionInline]
 
 
 @admin.register(CuttingSchedule)
 class CuttingScheduleAdmin(admin.ModelAdmin):
-    list_display  = ['zone', 'scheduled_date', 'month', 'year', 'executed']
+    list_display  = ['assignment', 'scheduled_date', 'month', 'year', 'executed']
     list_filter   = ['executed', 'year', 'month']
     ordering      = ['scheduled_date']
-    search_fields = ['zone__name']
+    search_fields = ['assignment__public_space_name']
 
 
 @admin.register(Intervention)
 class InterventionAdmin(admin.ModelAdmin):
-    list_display  = ['zone', 'execution_date', 'intervention_type', 'recorded_by']
+    list_display  = ['assignment', 'execution_date', 'intervention_type', 'recorded_by']
     list_filter   = ['intervention_type']
     ordering      = ['-execution_date']
-    search_fields = ['zone__name', 'recorded_by']
+    search_fields = ['assignment__public_space_name', 'recorded_by']
 
 
 @admin.register(SLAAlert)

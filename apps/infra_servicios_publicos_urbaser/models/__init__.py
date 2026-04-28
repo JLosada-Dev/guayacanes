@@ -2,7 +2,7 @@ from .veeduria import Complaint, Evidence
 from .operaciones import (
     SweepingMacroRoute,
     SweepingMicroRoute,
-    GreenZone,
+    GreenZoneAssignment,
     CuttingSchedule,
     Intervention,
 )
@@ -14,7 +14,7 @@ __all__ = [
     'Evidence',
     'SweepingMacroRoute',
     'SweepingMicroRoute',
-    'GreenZone',
+    'GreenZoneAssignment',
     'CuttingSchedule',
     'Intervention',
     'SLAAlert',

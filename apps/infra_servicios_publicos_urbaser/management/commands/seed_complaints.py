@@ -27,7 +27,7 @@ from apps.infra_servicios_publicos_urbaser.models import (
     SLAAlert,
     CommuneMetric,
     CuttingSchedule,
-    GreenZone,
+    GreenZoneAssignment,
 )
 
 
@@ -266,12 +266,14 @@ class Command(BaseCommand):
     def _create_overdue_schedule(self):
         """Crea una CuttingSchedule vencida en zona CAMPESTRE para triggerar violation directa."""
         try:
-            zone = GreenZone.objects.filter(name__icontains='CAMPESTRE').first()
-            if not zone:
+            assignment = GreenZoneAssignment.objects.filter(
+                public_space_name__icontains='CAMPESTRE'
+            ).first()
+            if not assignment:
                 return
             past = timezone.now().date() - timedelta(days=20)
             CuttingSchedule.objects.get_or_create(
-                zone=zone,
+                assignment=assignment,
                 scheduled_date=past,
                 defaults={
                     'month':    past.month,
@@ -280,7 +282,7 @@ class Command(BaseCommand):
                 },
             )
             self.stdout.write(
-                f'  [schedule] Vencido creado para zona {zone.name}'
+                f'  [schedule] Vencido creado para zona {assignment.public_space_name}'
             )
         except Exception as e:
             self.stderr.write(f'  [schedule] error: {e}')

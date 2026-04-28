@@ -12,10 +12,12 @@ Flujo:
 from django.utils import timezone
 from django.contrib.gis.db.models.functions import Transform
 
+from apps.geodata.models import PublicSpace
+
 from .signals import complaint_created
 from .models import (
     SweepingMicroRoute,
-    GreenZone,
+    GreenZoneAssignment,
     CuttingSchedule,
     SLAAlert,
     CommuneMetric,
@@ -151,10 +153,14 @@ def _process_green_zones(complaint_id, location, confidence, commune_id):
     """
     Cruce SLA para zonas verdes.
     Transforma a EPSG:3116 para medir en metros reales.
+
+    El cruce espacial es contra geodata.PublicSpace (la geometría),
+    pero solo se evalúa SLA para los espacios que tienen una
+    GreenZoneAssignment activa (responsabilidad operativa de Urbaser).
     """
     location_transformed = location.transform(3116, clone=True)
 
-    nearby = GreenZone.objects.filter(
+    nearby_spaces = PublicSpace.objects.filter(
         active=True,
         geom__isnull=False,
     ).annotate(
@@ -163,31 +169,44 @@ def _process_green_zones(complaint_id, location, confidence, commune_id):
         geom_m__dwithin=(location_transformed, 30)
     )
 
-    if not nearby.exists():
+    if not nearby_spaces.exists():
         return
 
     today = timezone.now().date()
 
-    for zone in nearby:
-        days_since = zone.days_since_last_intervention()
+    space_ids = list(nearby_spaces.values_list('id', flat=True))
+    assignments = {
+        a.public_space_id: a
+        for a in GreenZoneAssignment.objects.filter(
+            public_space_id__in=space_ids,
+            active=True,
+        )
+    }
+
+    for space in nearby_spaces:
+        assignment = assignments.get(space.id)
+        if assignment is None:
+            continue  # espacio sin responsabilidad Urbaser, ignorar
+
+        days_since = assignment.days_since_last_intervention()
         violation  = False
 
         if days_since is None:
             # Sin intervención registrada — verificar programación vencida
             overdue = CuttingSchedule.objects.filter(
-                zone=zone,
+                assignment=assignment,
                 scheduled_date__lt=today,
                 executed=False,
             ).exists()
             violation = overdue
         else:
-            violation = days_since > zone.cycle_days
+            violation = days_since > assignment.cycle_days
 
         SLAAlert.objects.create(
             complaint_id          = complaint_id,
             service_slug          = 'green-zones',
             route_type            = 'green_zone',
-            route_id              = zone.id,
+            route_id              = assignment.id,
             macroroute_code       = '',
             violation             = violation,
             days_since_intervention = days_since,
