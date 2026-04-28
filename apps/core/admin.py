@@ -1,5 +1,13 @@
 from django.contrib.gis import admin
-from .models import Commune, Neighborhood, Service, Aspect
+from .models import Commune, Neighborhood, Service, Aspect, Section
+
+
+@admin.register(Section)
+class SectionAdmin(admin.ModelAdmin):
+    list_display  = ['code', 'name', 'slug', 'active', 'order']
+    list_filter   = ['active']
+    search_fields = ['code', 'name', 'slug']
+    ordering      = ['order', 'name']
 
 
 @admin.register(Commune)
