@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'apps.geodata',
     'apps.veeduria',
     'apps.infra_servicios_publicos_urbaser',
-    'apps.infra_servicios_publicos_urbaser_facturacion',
 ]
 
 MIDDLEWARE = [
