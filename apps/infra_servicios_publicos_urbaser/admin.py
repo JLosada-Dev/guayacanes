@@ -4,6 +4,7 @@ from .models import (
     SweepingMacroRoute, SweepingMicroRoute,
     GreenZone, CuttingSchedule, Intervention,
     SLAAlert, CommuneMetric,
+    ServiceContent, AspectContent,
 )
 
 
@@ -136,6 +137,21 @@ class SLAAlertAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):    return False
     def has_change_permission(self, request, obj=None): return False
+
+
+@admin.register(ServiceContent)
+class ServiceContentAdmin(admin.ModelAdmin):
+    list_display  = ['service', 'icon', 'updated_at']
+    search_fields = ['service__name', 'summary']
+    autocomplete_fields = ['service']
+
+
+@admin.register(AspectContent)
+class AspectContentAdmin(admin.ModelAdmin):
+    list_display  = ['aspect', 'icon', 'response_time', 'updated_at']
+    search_fields = ['aspect__description']
+    list_filter   = ['aspect__service']
+    autocomplete_fields = ['aspect']
 
 
 @admin.register(CommuneMetric)

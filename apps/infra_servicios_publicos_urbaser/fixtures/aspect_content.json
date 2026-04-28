@@ -1,6 +1,6 @@
 [
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 1,
     "fields": {
       "aspect": 1,
@@ -12,7 +12,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 2,
     "fields": {
       "aspect": 2,
@@ -24,7 +24,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 3,
     "fields": {
       "aspect": 3,
@@ -36,7 +36,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 4,
     "fields": {
       "aspect": 4,
@@ -48,7 +48,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 5,
     "fields": {
       "aspect": 5,
@@ -60,7 +60,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 6,
     "fields": {
       "aspect": 6,
@@ -72,7 +72,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 7,
     "fields": {
       "aspect": 7,
@@ -84,7 +84,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 8,
     "fields": {
       "aspect": 8,
@@ -96,7 +96,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 9,
     "fields": {
       "aspect": 9,
@@ -108,7 +108,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 10,
     "fields": {
       "aspect": 10,
@@ -120,7 +120,7 @@
     }
   },
   {
-    "model": "core.aspectcontent",
+    "model": "infra_servicios_publicos_urbaser.aspectcontent",
     "pk": 11,
     "fields": {
       "aspect": 11,

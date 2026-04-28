@@ -7,6 +7,7 @@ from .operaciones import (
     Intervention,
 )
 from .auditoria import SLAAlert, CommuneMetric
+from .contenido import ServiceContent, AspectContent
 
 __all__ = [
     'Complaint',
@@ -18,4 +19,6 @@ __all__ = [
     'Intervention',
     'SLAAlert',
     'CommuneMetric',
+    'ServiceContent',
+    'AspectContent',
 ]

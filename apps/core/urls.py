@@ -6,7 +6,11 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 
-from .models import Service, Aspect, Commune, ServiceContent, AspectContent
+from .models import Service, Aspect, Commune
+# TODO: temporary cross-app import — move /core/services and /core/aspects
+# endpoints to a transversal location (or split: core for plain catalog,
+# urbaser for service-info-with-content) once the URL routers are reorganized.
+from apps.infra_servicios_publicos_urbaser.models import ServiceContent, AspectContent
 
 
 class AspectContentSerializer(serializers.ModelSerializer):

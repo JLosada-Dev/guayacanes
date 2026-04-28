@@ -1,6 +1,6 @@
 [
   {
-    "model": "core.servicecontent",
+    "model": "infra_servicios_publicos_urbaser.servicecontent",
     "pk": 1,
     "fields": {
       "service": 1,
@@ -13,7 +13,7 @@
     }
   },
   {
-    "model": "core.servicecontent",
+    "model": "infra_servicios_publicos_urbaser.servicecontent",
     "pk": 2,
     "fields": {
       "service": 2,
