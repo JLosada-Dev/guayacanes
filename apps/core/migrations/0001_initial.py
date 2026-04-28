@@ -2,6 +2,7 @@
 
 import django.contrib.gis.db.models.fields
 import django.db.models.deletion
+from django.contrib.postgres.operations import CreateExtension
 from django.db import migrations, models
 
 
@@ -13,6 +14,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        CreateExtension('postgis'),
         migrations.CreateModel(
             name='Commune',
             fields=[
