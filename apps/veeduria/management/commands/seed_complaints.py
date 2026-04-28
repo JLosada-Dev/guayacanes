@@ -22,10 +22,8 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apps.core.models import Service, Aspect, Commune
+from apps.veeduria.models import Complaint, SLAAlert, MetricByCommune
 from apps.infra_servicios_publicos_urbaser.models import (
-    Complaint,
-    SLAAlert,
-    CommuneMetric,
     CuttingSchedule,
     GreenZoneAssignment,
 )
@@ -173,10 +171,10 @@ class Command(BaseCommand):
         if options['clear']:
             c = Complaint.objects.count()
             a = SLAAlert.objects.count()
-            m = CommuneMetric.objects.count()
+            m = MetricByCommune.objects.count()
             Complaint.objects.all().delete()
             SLAAlert.objects.all().delete()
-            CommuneMetric.objects.all().delete()
+            MetricByCommune.objects.all().delete()
             self.stdout.write(self.style.WARNING(
                 f'Eliminadas: {c} denuncias, {a} alertas, {m} métricas.'
             ))
@@ -252,7 +250,7 @@ class Command(BaseCommand):
         total_complaints = Complaint.objects.count()
         total_alerts     = SLAAlert.objects.count()
         total_violations = SLAAlert.objects.filter(violation=True).count()
-        total_metrics    = CommuneMetric.objects.count()
+        total_metrics    = MetricByCommune.objects.count()
 
         self.stdout.write(self.style.SUCCESS(
             f'\n{created} denuncias creadas ({with_alerts} con alertas generadas).'
