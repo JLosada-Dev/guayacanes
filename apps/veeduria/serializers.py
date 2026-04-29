@@ -3,11 +3,35 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from django.contrib.gis.geos import Point
 
 from apps.core.models import Commune
-# TODO: temporary cross-app import — Service/Aspect will be resolved via
-# the ServiceProvider registry once the serializer is rewritten in a
-# later commit (snapshot section_slug + use registry).
-from apps.infra_servicios_publicos_urbaser.models import Service, Aspect
+from apps.core.registry import all_providers
 from .models import Complaint, Evidence, SLAAlert, MetricByCommune
+
+
+def _resolve_service(service_slug: str):
+    """
+    Busca un service_slug en todos los providers registrados.
+    Retorna el ServiceInfo del primer match o None.
+    """
+    for provider in all_providers():
+        for service in provider.get_services():
+            if service.slug == service_slug:
+                return service
+    return None
+
+
+def _resolve_aspect(service_slug: str, aspect_slug: str):
+    """
+    Busca un aspect_slug dentro de un servicio específico.
+    Itera providers — el primero que tenga el service_slug responde.
+    """
+    for provider in all_providers():
+        services = provider.get_services()
+        if not any(s.slug == service_slug for s in services):
+            continue
+        for aspect in provider.get_aspects(service_slug):
+            if aspect.slug == aspect_slug:
+                return aspect
+    return None
 
 
 class EvidenceSerializer(serializers.ModelSerializer):
@@ -23,24 +47,30 @@ class ComplaintSerializer(serializers.ModelSerializer):
 
     Reglas críticas:
     - location NUNCA puede ser NULL — cascada: gps → manual → centroid
-    - service_id y aspect_id se validan contra core
-    - Se guardan snapshots de texto al momento del guardado
+    - service_slug y aspect_slug se validan contra el ServiceProvider registry
+    - Se guardan snapshots de texto (section, service, aspect) al guardar
     """
-    evidence           = EvidenceSerializer(many=True, read_only=True)
-    latitude           = serializers.FloatField(write_only=True, required=False)
-    longitude          = serializers.FloatField(write_only=True, required=False)
-    # Rellenados en validate() desde el catálogo — no requeridos en el input
-    service_slug       = serializers.CharField(max_length=100, required=False)
-    service_name       = serializers.CharField(max_length=100, required=False)
-    aspect_slug        = serializers.CharField(max_length=100, required=False)
-    aspect_description = serializers.CharField(max_length=200, required=False)
+    evidence     = EvidenceSerializer(many=True, read_only=True)
+    latitude     = serializers.FloatField(write_only=True, required=False)
+    longitude    = serializers.FloatField(write_only=True, required=False)
+
+    # Inputs requeridos
+    service_slug = serializers.CharField(max_length=100)
+    aspect_slug  = serializers.CharField(max_length=100)
+
+    # Rellenados en validate(); read-only en la respuesta
+    section_slug       = serializers.CharField(max_length=20,  read_only=True)
+    section_name       = serializers.CharField(max_length=100, read_only=True)
+    service_name       = serializers.CharField(max_length=100, read_only=True)
+    aspect_description = serializers.CharField(max_length=200, read_only=True)
 
     class Meta:
         model  = Complaint
         fields = [
             'id',
-            'service_id', 'service_slug', 'service_name',
-            'aspect_id', 'aspect_slug', 'aspect_description',
+            'section_slug', 'section_name',
+            'service_slug', 'service_name',
+            'aspect_slug', 'aspect_description',
             'commune_id', 'commune_name',
             'neighborhood_id', 'neighborhood_name',
             'is_rural', 'hamlet_name',
@@ -52,30 +82,30 @@ class ComplaintSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'status']
 
     def validate(self, data):
-        # ── Validar servicio ──────────────────────────────────────
-        service_id = data.get('service_id')
-        try:
-            service = Service.objects.get(id=service_id, active=True)
-            data['service_slug'] = service.slug
-            data['service_name'] = service.name
-        except Service.DoesNotExist:
-            raise serializers.ValidationError(
-                {'service_id': 'Servicio no encontrado o inactivo.'}
-            )
+        service_slug = data.get('service_slug')
+        aspect_slug  = data.get('aspect_slug')
 
-        # ── Validar aspecto ───────────────────────────────────────
-        aspect_id = data.get('aspect_id')
-        try:
-            aspect = service.aspects.get(id=aspect_id, active=True)
-            data['aspect_slug']        = aspect.slug
-            data['aspect_description'] = aspect.description
-        except Exception:
+        # ── Resolver servicio ─────────────────────────────────────
+        service_info = _resolve_service(service_slug)
+        if service_info is None or not service_info.active:
             raise serializers.ValidationError(
-                {'aspect_id': 'Aspecto no encontrado o no pertenece al servicio.'}
+                {'service_slug': 'Servicio no encontrado o inactivo.'}
             )
+        data['section_slug'] = service_info.section_slug
+        data['section_name'] = service_info.section_name
+        data['service_name'] = service_info.name
+
+        # ── Resolver aspecto ──────────────────────────────────────
+        aspect_info = _resolve_aspect(service_slug, aspect_slug)
+        if aspect_info is None or not aspect_info.active:
+            raise serializers.ValidationError(
+                {'aspect_slug': 'Aspecto no encontrado o no pertenece al servicio.'}
+            )
+        data['aspect_description'] = aspect_info.description
 
         # ── Resolver nombre de comuna ─────────────────────────────
         commune_id = data.get('commune_id')
+        commune    = None
         if commune_id:
             try:
                 commune = Commune.objects.get(id=commune_id)
@@ -91,7 +121,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
 
         if lat is not None and lng is not None:
             data['location'] = Point(lng, lat, srid=4326)
-        elif commune_id:
+        elif commune is not None:
             data['location']        = commune.geom.centroid
             data['location_source'] = 'centroid'
         else:
@@ -131,6 +161,6 @@ class ComplaintGeoSerializer(GeoFeatureModelSerializer):
         model        = Complaint
         geo_field    = 'location'
         fields = [
-            'id', 'service_slug', 'aspect_description',
+            'id', 'section_slug', 'service_slug', 'aspect_description',
             'commune_name', 'status', 'created_at',
         ]

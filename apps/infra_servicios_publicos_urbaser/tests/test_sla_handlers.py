@@ -14,9 +14,9 @@ def test_sweeping_handler_creates_alert(
     aspect = sweeping_service.aspects.first()
 
     Complaint.objects.create(
-        service_id=sweeping_service.id,
+        section_slug='urbaser',
         service_slug='sweeping-cleaning',
-        aspect_id=aspect.id,
+        aspect_slug=aspect.slug,
         aspect_description=aspect.description,
         commune_id=commune.id,
         location=point_inside_route,
@@ -42,9 +42,9 @@ def test_green_zones_handler_creates_alert(
     aspect = green_zones_service.aspects.first()
 
     Complaint.objects.create(
-        service_id=green_zones_service.id,
+        section_slug='urbaser',
         service_slug='green-zones',
-        aspect_id=aspect.id,
+        aspect_slug=aspect.slug,
         aspect_description=aspect.description,
         commune_id=commune.id,
         location=point_inside_route,
@@ -70,9 +70,9 @@ def test_metric_recalculated_after_alert(
     assert MetricByCommune.objects.count() == 0
 
     Complaint.objects.create(
-        service_id=sweeping_service.id,
+        section_slug='urbaser',
         service_slug='sweeping-cleaning',
-        aspect_id=aspect.id,
+        aspect_slug=aspect.slug,
         aspect_description=aspect.description,
         commune_id=commune.id,
         location=point_inside_route,

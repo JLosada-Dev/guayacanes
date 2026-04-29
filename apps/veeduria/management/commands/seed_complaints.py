@@ -218,10 +218,10 @@ class Command(BaseCommand):
             ) - timedelta(days=i % 5)
 
             complaint = Complaint(
-                service_id         = service.id,
+                section_slug       = 'urbaser',
+                section_name       = 'Urbaser S.A. E.S.P.',
                 service_slug       = service.slug,
                 service_name       = service.name,
-                aspect_id          = aspect.id,
                 aspect_slug        = aspect.slug,
                 aspect_description = aspect.description,
                 commune_id         = commune.id,

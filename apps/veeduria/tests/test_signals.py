@@ -19,10 +19,10 @@ def test_complaint_created_emits_signal(sweeping_service):
 
     try:
         complaint = Complaint.objects.create(
-            service_id=sweeping_service.id,
+            section_slug='urbaser',
+            section_name='Urbaser S.A. E.S.P.',
             service_slug=sweeping_service.slug,
             service_name=sweeping_service.name,
-            aspect_id=aspect.id,
             aspect_slug=aspect.slug,
             aspect_description=aspect.description,
             location=Point(-76.60, 2.47, srid=4326),
@@ -46,9 +46,9 @@ def test_handler_filters_by_slug_and_skips_unknown_service(sweeping_service):
     aspect = sweeping_service.aspects.first()
 
     Complaint.objects.create(
-        service_id=sweeping_service.id,
+        section_slug='unknown',
         service_slug='unknown-service',  # ningún handler responde a este slug
-        aspect_id=aspect.id,
+        aspect_slug=aspect.slug,
         aspect_description=aspect.description,
         location=Point(-76.60, 2.47, srid=4326),
         location_source='gps',

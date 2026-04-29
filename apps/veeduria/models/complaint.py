@@ -31,10 +31,10 @@ class Complaint(models.Model):
     ]
 
     # ── Qué ──────────────────────────────────────────────────────
-    service_id          = models.IntegerField()
+    section_slug        = models.CharField(max_length=20, blank=True)
+    section_name        = models.CharField(max_length=100, blank=True)
     service_slug        = models.CharField(max_length=100)
     service_name        = models.CharField(max_length=100, blank=True)
-    aspect_id           = models.IntegerField()
     aspect_slug         = models.CharField(max_length=100, blank=True)
     aspect_description  = models.CharField(max_length=200)
 
@@ -72,6 +72,7 @@ class Complaint(models.Model):
         verbose_name        = 'Denuncia ciudadana'
         verbose_name_plural = 'Denuncias ciudadanas'
         indexes = [
+            models.Index(fields=['section_slug'], name='idx_vee_complaint_section'),
             models.Index(fields=['service_slug'], name='idx_vee_complaint_service'),
             models.Index(fields=['status'],       name='idx_vee_complaint_status'),
             models.Index(fields=['created_at'],   name='idx_vee_complaint_date'),
