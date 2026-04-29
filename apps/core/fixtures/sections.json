@@ -1,0 +1,67 @@
+[
+  {
+    "model": "core.section",
+    "pk": 1,
+    "fields": {
+      "code": "urbaser",
+      "slug": "urbaser",
+      "name": "Urbaser S.A. E.S.P.",
+      "description": "Operador del contrato de aseo urbano de Popayán (PPS 2024). Gestiona barrido, limpieza y mantenimiento de zonas verdes.",
+      "app_label": "infra_servicios_publicos_urbaser",
+      "active": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "core.section",
+    "pk": 2,
+    "fields": {
+      "code": "urbaser-facturacion",
+      "slug": "urbaser-facturacion",
+      "name": "Urbaser — Facturación",
+      "description": "Módulo de facturación del contrato de aseo (Fase 2).",
+      "app_label": "infra_servicios_publicos_urbaser_facturacion",
+      "active": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "core.section",
+    "pk": 3,
+    "fields": {
+      "code": "vivienda",
+      "slug": "vivienda",
+      "name": "Secretaría de Vivienda",
+      "description": "Programas de vivienda, estratificación y subsidios de mejoramiento.",
+      "app_label": "infra_servicios_publicos_vivienda",
+      "active": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "core.section",
+    "pk": 4,
+    "fields": {
+      "code": "cultura",
+      "slug": "cultura",
+      "name": "Secretaría de Cultura",
+      "description": "Programas culturales, eventos y patrimonio.",
+      "app_label": "infra_servicios_publicos_cultura",
+      "active": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "core.section",
+    "pk": 5,
+    "fields": {
+      "code": "acueducto",
+      "slug": "acueducto",
+      "name": "Empresa de Acueducto y Alcantarillado",
+      "description": "Operador de los servicios de acueducto y alcantarillado.",
+      "app_label": "infra_servicios_publicos_acueducto",
+      "active": false,
+      "order": 5
+    }
+  }
+]
