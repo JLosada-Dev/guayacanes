@@ -15,8 +15,11 @@ Lógica:
     → violation=True
     + schedule.executed=False con fecha pasada → violation directa
 """
+from datetime import datetime
+
 from django.utils import timezone
 from django.contrib.gis.db.models.functions import Transform
+from django.contrib.gis.geos import Point
 
 from apps.geodata.models import PublicSpace
 from apps.veeduria.models import SLAAlert
@@ -42,6 +45,9 @@ def handle_complaint(sender, service_slug, **kwargs):
     """
     Entry point conectado a veeduria.complaint_created.
     Filtra por slug y delega al procesador correspondiente.
+
+    El payload del evento es solo primitivos (lat, lng, ISO timestamp).
+    Aquí reconstruimos los objetos GeoDjango para hacer las queries.
     """
     if service_slug not in URBASER_SLUGS:
         return
@@ -49,17 +55,24 @@ def handle_complaint(sender, service_slug, **kwargs):
     confidence = CONFIDENCE_MAP.get(kwargs.get('location_source'), 'low')
     commune_id = kwargs.get('commune_id')
 
+    location = Point(
+        kwargs['location_lng'],
+        kwargs['location_lat'],
+        srid=4326,
+    )
+
     if service_slug == 'sweeping-cleaning':
+        created_at = datetime.fromisoformat(kwargs['created_at'])
         _process_sweeping(
             complaint_id = kwargs['complaint_id'],
-            location     = kwargs['location'],
-            created_at   = kwargs['created_at'],
+            location     = location,
+            created_at   = created_at,
             confidence   = confidence,
         )
     elif service_slug == 'green-zones':
         _process_green_zones(
             complaint_id = kwargs['complaint_id'],
-            location     = kwargs['location'],
+            location     = location,
             confidence   = confidence,
         )
 

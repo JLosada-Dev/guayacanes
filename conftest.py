@@ -9,9 +9,27 @@ import pytest
 from django.contrib.gis.geos import LineString, MultiPolygon, Point, Polygon
 
 
+@pytest.fixture(autouse=True)
+def _section(db):
+    """
+    Section 'urbaser' siempre disponible: el provider la consulta para
+    enriquecer ServiceInfo.section_name.
+    """
+    from apps.core.models import Section
+    Section.objects.update_or_create(
+        slug='urbaser',
+        defaults={
+            'code': 'urbaser',
+            'name': 'Urbaser S.A. E.S.P.',
+            'active': True,
+            'order': 1,
+        },
+    )
+
+
 @pytest.fixture
 def sweeping_service(db):
-    from apps.core.models import Service, Aspect
+    from apps.infra_servicios_publicos_urbaser.models import Service, Aspect
 
     service = Service.objects.create(
         name='Barrido y Limpieza',
@@ -28,7 +46,7 @@ def sweeping_service(db):
 
 @pytest.fixture
 def green_zones_service(db):
-    from apps.core.models import Service, Aspect
+    from apps.infra_servicios_publicos_urbaser.models import Service, Aspect
 
     service = Service.objects.create(
         name='Zonas Verdes',

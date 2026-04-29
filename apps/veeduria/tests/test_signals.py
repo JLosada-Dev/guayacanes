@@ -34,10 +34,16 @@ def test_complaint_created_emits_signal(sweeping_service):
     assert received.call_count == 1
     kwargs = received.call_args.kwargs
     assert kwargs['complaint_id']    == complaint.id
+    assert kwargs['section_slug']    == 'urbaser'
     assert kwargs['service_slug']    == 'sweeping-cleaning'
     assert kwargs['aspect_slug']     == aspect.slug
     assert kwargs['location_source'] == 'gps'
-    assert kwargs['location'].x == pytest.approx(-76.60)
+
+    # Payload serializable (primitivos solamente)
+    assert isinstance(kwargs['location_wkt'], str)
+    assert kwargs['location_lat'] == pytest.approx(2.47)
+    assert kwargs['location_lng'] == pytest.approx(-76.60)
+    assert isinstance(kwargs['created_at'], str)  # ISO 8601
 
 
 @pytest.mark.django_db
