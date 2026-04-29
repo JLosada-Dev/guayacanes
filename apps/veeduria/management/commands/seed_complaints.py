@@ -21,9 +21,11 @@ from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from apps.core.models import Service, Aspect, Commune
+from apps.core.models import Commune
 from apps.veeduria.models import Complaint, SLAAlert, MetricByCommune
 from apps.infra_servicios_publicos_urbaser.models import (
+    Service,
+    Aspect,
     CuttingSchedule,
     GreenZoneAssignment,
 )

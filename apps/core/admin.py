@@ -1,5 +1,5 @@
 from django.contrib.gis import admin
-from .models import Commune, Neighborhood, Service, Aspect, Section
+from .models import Commune, Neighborhood, Section
 
 
 @admin.register(Section)
@@ -25,19 +25,3 @@ class NeighborhoodAdmin(admin.GISModelAdmin):
     list_filter   = ['commune']
     autocomplete_fields = ['commune']
     exclude       = ['geom']
-
-
-@admin.register(Service)
-class ServiceAdmin(admin.ModelAdmin):
-    list_display  = ['name', 'slug', 'active', 'order']
-    ordering      = ['order']
-    search_fields = ['name', 'slug']
-    list_filter   = ['active']
-
-
-@admin.register(Aspect)
-class AspectAdmin(admin.ModelAdmin):
-    list_display  = ['description', 'service', 'slug', 'active']
-    ordering      = ['service__order', 'description']
-    search_fields = ['description', 'slug']
-    list_filter   = ['service', 'active']

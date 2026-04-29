@@ -1,6 +1,6 @@
 [
   {
-    "model": "core.service",
+    "model": "infra_servicios_publicos_urbaser.service",
     "pk": 1,
     "fields": {
       "name": "Barrido y Limpieza",
@@ -11,7 +11,7 @@
     }
   },
   {
-    "model": "core.service",
+    "model": "infra_servicios_publicos_urbaser.service",
     "pk": 2,
     "fields": {
       "name": "Corte de Césped y Zonas Verdes",
@@ -22,7 +22,7 @@
     }
   },
   {
-    "model": "core.service",
+    "model": "infra_servicios_publicos_urbaser.service",
     "pk": 3,
     "fields": {
       "name": "Recolección y Transporte",
@@ -33,7 +33,7 @@
     }
   },
   {
-    "model": "core.service",
+    "model": "infra_servicios_publicos_urbaser.service",
     "pk": 4,
     "fields": {
       "name": "Lavado de Vías y Áreas Públicas",
@@ -44,7 +44,7 @@
     }
   },
   {
-    "model": "core.service",
+    "model": "infra_servicios_publicos_urbaser.service",
     "pk": 5,
     "fields": {
       "name": "Poda de Árboles",

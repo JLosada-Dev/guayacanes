@@ -20,8 +20,8 @@ migrate:
 
 # Cargar datos iniciales (fixtures + geodatos)
 data:
-	uv run python manage.py loaddata apps/core/fixtures/services.json
-	uv run python manage.py loaddata apps/core/fixtures/aspects.json
+	uv run python manage.py loaddata apps/infra_servicios_publicos_urbaser/fixtures/services.json
+	uv run python manage.py loaddata apps/infra_servicios_publicos_urbaser/fixtures/aspects.json
 	uv run python manage.py loaddata apps/infra_servicios_publicos_urbaser/fixtures/service_content.json
 	uv run python manage.py loaddata apps/infra_servicios_publicos_urbaser/fixtures/aspect_content.json
 	uv run python manage.py load_communes

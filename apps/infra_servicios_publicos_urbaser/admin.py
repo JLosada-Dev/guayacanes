@@ -1,9 +1,40 @@
 from django.contrib.gis import admin
 from .models import (
+    Service, Aspect,
     SweepingMacroRoute, SweepingMicroRoute,
     GreenZoneAssignment, CuttingSchedule, Intervention,
     ServiceContent, AspectContent,
 )
+
+
+class ServiceContentInline(admin.StackedInline):
+    model       = ServiceContent
+    extra       = 1
+    fields      = ['icon', 'summary', 'full_description', 'frequency', 'citizen_rights']
+
+
+class AspectContentInline(admin.StackedInline):
+    model       = AspectContent
+    extra       = 1
+    fields      = ['icon', 'what_is', 'how_to_evidence', 'response_time']
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display  = ['name', 'slug', 'active', 'order']
+    ordering      = ['order']
+    search_fields = ['name', 'slug']
+    list_filter   = ['active']
+    inlines       = [ServiceContentInline]
+
+
+@admin.register(Aspect)
+class AspectAdmin(admin.ModelAdmin):
+    list_display  = ['description', 'service', 'slug', 'active']
+    ordering      = ['service__order', 'description']
+    search_fields = ['description', 'slug']
+    list_filter   = ['service', 'active']
+    inlines       = [AspectContentInline]
 
 
 class SweepingMicroRouteInline(admin.TabularInline):

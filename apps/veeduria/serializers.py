@@ -2,7 +2,11 @@ from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from django.contrib.gis.geos import Point
 
-from apps.core.models import Service, Aspect, Commune
+from apps.core.models import Commune
+# TODO: temporary cross-app import — Service/Aspect will be resolved via
+# the ServiceProvider registry once the serializer is rewritten in a
+# later commit (snapshot section_slug + use registry).
+from apps.infra_servicios_publicos_urbaser.models import Service, Aspect
 from .models import Complaint, Evidence, SLAAlert, MetricByCommune
 
 

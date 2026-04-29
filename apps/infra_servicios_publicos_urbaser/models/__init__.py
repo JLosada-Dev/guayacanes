@@ -1,3 +1,4 @@
+from .catalog import Service, Aspect
 from .operaciones import (
     SweepingMacroRoute,
     SweepingMicroRoute,
@@ -8,6 +9,8 @@ from .operaciones import (
 from .contenido import ServiceContent, AspectContent
 
 __all__ = [
+    'Service',
+    'Aspect',
     'SweepingMacroRoute',
     'SweepingMicroRoute',
     'GreenZoneAssignment',

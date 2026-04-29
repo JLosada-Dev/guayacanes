@@ -1,6 +1,6 @@
 from django.db import models
 
-from apps.core.models import Service, Aspect
+from .catalog import Service, Aspect
 
 
 class ServiceContent(models.Model):
