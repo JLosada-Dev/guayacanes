@@ -12,10 +12,10 @@ class EvidenceInline(admin.TabularInline):
 @admin.register(Complaint)
 class ComplaintAdmin(admin.GISModelAdmin):
     list_display    = [
-        'id', 'service_slug', 'aspect_description',
+        'id', 'section_slug', 'service_slug', 'aspect_description',
         'commune_name', 'status', 'location_source', 'created_at',
     ]
-    list_filter     = ['status', 'service_slug', 'location_source', 'is_rural']
+    list_filter     = ['status', 'section_slug', 'service_slug', 'location_source', 'is_rural']
     search_fields   = ['aspect_description', 'commune_name', 'neighborhood_name']
     ordering        = ['-created_at']
     readonly_fields = ['created_at']
@@ -23,8 +23,9 @@ class ComplaintAdmin(admin.GISModelAdmin):
     fieldsets = [
         ('Qué', {
             'fields': [
-                'service_id', 'service_slug', 'service_name',
-                'aspect_id', 'aspect_slug', 'aspect_description',
+                'section_slug', 'section_name',
+                'service_slug', 'service_name',
+                'aspect_slug', 'aspect_description',
             ]
         }),
         ('Dónde', {
