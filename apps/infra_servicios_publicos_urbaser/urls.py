@@ -1,10 +1,14 @@
 from rest_framework.routers import DefaultRouter
-from .views import ComplaintViewSet, EvidenceViewSet, SLAAlertViewSet, CommuneMetricViewSet
+
+from .views import (
+    SweepingMacroRouteViewSet,
+    SweepingMicroRouteViewSet,
+    GreenZoneAssignmentViewSet,
+)
 
 router = DefaultRouter()
-router.register(r'complaints', ComplaintViewSet,    basename='complaint')
-router.register(r'evidence',   EvidenceViewSet,     basename='evidence')
-router.register(r'alerts',     SLAAlertViewSet,     basename='alert')
-router.register(r'metrics',    CommuneMetricViewSet, basename='metric')
+router.register(r'sweeping-macroroutes',    SweepingMacroRouteViewSet,    basename='sweeping-macroroute')
+router.register(r'sweeping-microroutes',    SweepingMicroRouteViewSet,    basename='sweeping-microroute')
+router.register(r'green-zone-assignments',  GreenZoneAssignmentViewSet,   basename='green-zone-assignment')
 
 urlpatterns = router.urls

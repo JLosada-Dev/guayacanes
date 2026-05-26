@@ -98,70 +98,51 @@ class SweepingMicroRoute(models.Model):
         return f'{self.macroroute.code} — {self.layer}'
 
 
-class GreenZone(models.Model):
+class GreenZoneAssignment(models.Model):
     """
-    Área verde bajo responsabilidad de Urbaser.
-    Fuente geometría: combinar 4 shapefiles del POT:
-      U19_ESPACIO_PUBLICO2.shp  (11 parques)
-      U19_ESPACIO_PUBLICO3.shp  (96 nodos)
-      U19_ESPACIO_PUBLICO5.shp  (72 corredores)
-      SEPARADOR.shp             (132 separadores)
+    Responsabilidad operativa de Urbaser sobre un espacio público.
+    La geometría vive en geodata.PublicSpace; este modelo solo
+    aporta la lógica contractual del PPS 2024 (cycle_days, programación
+    de cortes, intervenciones realizadas).
+
+    Soft FK a geodata.PublicSpace para que otra app pueda referenciar
+    el mismo polígono con su propia operación sin chocar.
 
     external_id: ID del polígono en el cronograma PDF de Urbaser.
-    ciclo_dias: 11 días según datos reales de febrero 2026.
-
-    geom null=True hasta cruzar shapefiles con cronograma PDF.
+    Cuando se cruce con el cronograma se reemplaza el seed inicial
+    (que reutiliza public_space.external_id) por el ID real del PDF.
+    cycle_days: 11 días según datos reales de febrero 2026.
     """
-    ZONE_TYPE_CHOICES = [
-        ('park',        'Parque público'),
-        ('road_divider','Separador vial'),
-        ('bike_path',   'Ciclovía'),
-        ('roundabout',  'Glorieta / rotonda'),
-        ('sports',      'Polideportivo'),
-        ('other',       'Otro'),
-    ]
-
+    # Soft FK a geodata_public_space
+    public_space_id   = models.IntegerField(db_index=True)
+    public_space_name = models.CharField(
+        max_length=300, blank=True,
+        help_text='Snapshot del nombre al momento del registro',
+    )
     external_id       = models.IntegerField(
         unique=True,
         help_text='ID del polígono en el cronograma PDF de Urbaser',
-    )
-    name              = models.CharField(max_length=300)
-    zone_type         = models.CharField(
-        max_length=20,
-        choices=ZONE_TYPE_CHOICES,
-        default='park',
-    )
-    area_sqm          = models.DecimalField(
-        max_digits=12, decimal_places=2,
-        null=True, blank=True,
-        help_text='Área en m² del cronograma PDF',
     )
     cycle_days        = models.IntegerField(
         default=11,
         help_text='Días entre cortes según contrato',
     )
-    # Soft FK a core_neighborhood
-    neighborhood_id   = models.IntegerField(null=True, blank=True)
-    neighborhood_name = models.CharField(max_length=150, blank=True)
     active            = models.BooleanField(default=True)
-    geom              = models.MultiPolygonField(
-        srid=4326, null=True, blank=True,
-        help_text='Polígono del área — null hasta cruzar con shapefiles POT',
-    )
 
     class Meta:
-        db_table            = 'urbaser_green_zone'
-        ordering            = ['name']
-        verbose_name        = 'Zona verde'
-        verbose_name_plural = 'Zonas verdes'
+        db_table            = 'urbaser_green_zone_assignment'
+        ordering            = ['external_id']
+        verbose_name        = 'Asignación de zona verde'
+        verbose_name_plural = 'Asignaciones de zonas verdes'
 
     def __str__(self):
-        return f'{self.name} (ID {self.external_id})'
+        name = self.public_space_name or f'Espacio {self.public_space_id}'
+        return f'{name} (Urbaser ID {self.external_id})'
 
     def days_since_last_intervention(self):
         """
         Días desde el último corte registrado.
-        Usado por aud/receivers.py para determinar incumplimiento.
+        Usado por receivers.py para determinar incumplimiento.
         """
         from django.utils import timezone
         last = self.interventions.order_by('-execution_date').first()
@@ -177,8 +158,8 @@ class CuttingSchedule(models.Model):
 
     Si scheduled_date ya pasó y executed=False → incumplimiento directo.
     """
-    zone             = models.ForeignKey(
-        GreenZone,
+    assignment       = models.ForeignKey(
+        GreenZoneAssignment,
         on_delete=models.CASCADE,
         related_name='schedules',
     )
@@ -192,10 +173,10 @@ class CuttingSchedule(models.Model):
         ordering        = ['scheduled_date']
         verbose_name    = 'Programación de corte'
         verbose_name_plural = 'Programaciones de corte'
-        unique_together = [['zone', 'scheduled_date']]
+        unique_together = [['assignment', 'scheduled_date']]
 
     def __str__(self):
-        return f'{self.zone.name} — {self.scheduled_date}'
+        return f'{self.assignment} — {self.scheduled_date}'
 
 
 class Intervention(models.Model):
@@ -208,8 +189,8 @@ class Intervention(models.Model):
         ('tree_pruning', 'Poda de árbol'),
     ]
 
-    zone             = models.ForeignKey(
-        GreenZone,
+    assignment       = models.ForeignKey(
+        GreenZoneAssignment,
         on_delete=models.CASCADE,
         related_name='interventions',
     )
@@ -235,7 +216,7 @@ class Intervention(models.Model):
         verbose_name_plural = 'Intervenciones registradas'
 
     def __str__(self):
-        return f'{self.zone.name} — {self.get_intervention_type_display()} {self.execution_date}'
+        return f'{self.assignment} — {self.get_intervention_type_display()} {self.execution_date}'
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

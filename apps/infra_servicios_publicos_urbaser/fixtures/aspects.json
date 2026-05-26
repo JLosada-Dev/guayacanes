@@ -1,0 +1,57 @@
+[
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 1,
+    "fields": { "service": 1, "slug": "scope", "description": "Alcance del barrido incompleto", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 2,
+    "fields": { "service": 1, "slug": "frequency", "description": "Frecuencia de barrido no cumplida", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 3,
+    "fields": { "service": 1, "slug": "cleanliness", "description": "Limpieza deficiente", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 4,
+    "fields": { "service": 1, "slug": "sand-residue", "description": "Arenilla no recogida", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 5,
+    "fields": { "service": 1, "slug": "weed-removal", "description": "Desmoñe sin realizar", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 6,
+    "fields": { "service": 1, "slug": "bins", "description": "Cestas sin vaciado", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 7,
+    "fields": { "service": 1, "slug": "quality", "description": "Calidad del barrido deficiente", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 8,
+    "fields": { "service": 2, "slug": "cutting-not-done", "description": "Corte de césped no realizado", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 9,
+    "fields": { "service": 2, "slug": "frequency-missed", "description": "Frecuencia de corte incumplida", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 10,
+    "fields": { "service": 2, "slug": "pruning-waste-left", "description": "Residuos de poda sin recoger", "active": true }
+  },
+  {
+    "model": "infra_servicios_publicos_urbaser.aspect",
+    "pk": 11,
+    "fields": { "service": 2, "slug": "area-deteriorated", "description": "Área verde deteriorada o descuidada", "active": true }
+  }
+]

@@ -6,8 +6,10 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/core/',    include('apps.core.urls')),
-    path('api/v1/urbaser/', include('apps.infra_servicios_publicos_urbaser.urls')),
+    path('api/v1/auth/',     include('apps.accounts.urls')),
+    path('api/v1/core/',     include('apps.core.urls')),
+    path('api/v1/veeduria/', include('apps.veeduria.urls')),
+    path('api/v1/urbaser/',  include('apps.infra_servicios_publicos_urbaser.urls')),
     # Documentación API
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/',   SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

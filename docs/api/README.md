@@ -25,6 +25,7 @@ Los tres endpoints se actualizan automáticamente cada vez que se modifica un Vi
 | GET | `/core/services/` | Servicios activos + contenido editorial |
 | GET | `/core/aspects/?service=<slug>` | Aspectos de un servicio |
 | GET | `/core/communes/` | 9 comunas de Popayán con geometría |
+| GET | `/core/neighborhoods/?commune_id=<id>` | Barrios de una comuna (para fuzzy search en cliente) |
 | POST | `/urbaser/complaints/` | Crear denuncia ciudadana |
 | GET | `/urbaser/complaints/` | Listar denuncias (con filtros) |
 | GET | `/urbaser/complaints/{id}/` | Detalle de denuncia |
@@ -191,6 +192,34 @@ Retorna las 9 comunas de Popayán con su geometría en EPSG:4326.
 
 ---
 
+### GET /api/v1/core/neighborhoods/?commune_id=\<id\>
+
+Lista los barrios de una comuna, ordenados alfabéticamente. Pensado
+para alimentar un selector con búsqueda aproximada (fuzzy) en cliente:
+la respuesta es plana, sin geometría, y no pagina (≤60 barrios por
+comuna).
+
+**Parámetros:**
+
+| Parámetro | Tipo | Requerido | Descripción |
+|-----------|------|-----------|-------------|
+| `commune_id` | integer | Sí | PK de la comuna (`Commune.id`, no `Commune.number`) |
+
+**Respuesta 200:**
+```json
+[
+  { "id": 1,  "name": "Alcalá",  "commune_id": 8 },
+  { "id": 2,  "name": "Antonio Nariño", "commune_id": 8 },
+  { "id": 3,  "name": "Belalcázar", "commune_id": 8 }
+]
+```
+
+**Respuestas de error:**
+- `400` si `commune_id` falta o no es entero.
+- Lista vacía (`[]`) si la comuna existe pero aún no tiene barrios cargados.
+
+---
+
 ## Veeduría — Denuncias
 
 ### POST /api/v1/urbaser/complaints/
@@ -227,6 +256,8 @@ Crea una denuncia ciudadana. Dispara automáticamente el pipeline SLA via signal
 | `neighborhood_name` | string | No | Nombre snapshot del barrio |
 | `is_rural` | boolean | No | `true` si es zona rural |
 | `hamlet_name` | string | No | Nombre de la vereda si `is_rural=true` |
+| `address` | string | No | Dirección textual opcional (máx 300 chars) para refinar la ubicación |
+| `custom_aspect_description` | string | Sí si `aspect_slug="other-issue"` | Descripción del problema cuando el ciudadano elige "Otros" al elegir el aspecto. Se ignora para cualquier otro `aspect_slug`. Válido para cualquier `service_slug` del catálogo. |
 | `latitude` | float | No* | Latitud GPS (EPSG:4326) |
 | `longitude` | float | No* | Longitud GPS (EPSG:4326) |
 | `location_source` | string | No | `gps` / `manual` / `centroid` |
@@ -249,6 +280,8 @@ Crea una denuncia ciudadana. Dispara automáticamente el pipeline SLA via signal
 2. `aspect_id` se valida contra los aspectos del servicio — debe existir y `active=True`, y pertenecer al servicio
 3. Los campos `service_slug`, `service_name`, `aspect_slug`, `aspect_description` se llenan automáticamente desde el catálogo (snapshot)
 4. `commune_name` se llena automáticamente si solo se envía `commune_id`
+5. Si viene `neighborhood_id`, debe pertenecer a `commune_id`; `neighborhood_name` se llena como snapshot. Si no pertenece → `400`.
+6. Si `aspect_slug="other-issue"`, `custom_aspect_description` es obligatorio (no vacío). El aspect es transversal: válido para cualquier `service_slug` real del catálogo. El snapshot `aspect_description` se rellena con el texto custom. Para cualquier otro `aspect_slug`, `custom_aspect_description` se fuerza a `""`.
 
 **Respuesta 201:**
 ```json

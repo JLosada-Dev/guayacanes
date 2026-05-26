@@ -1,11 +1,8 @@
 from .geography import Commune, Neighborhood
-from .catalog import Service, Aspect, ServiceContent, AspectContent
+from .section import Section
 
 __all__ = [
     'Commune',
     'Neighborhood',
-    'Service',
-    'Aspect',
-    'ServiceContent',
-    'AspectContent',
+    'Section',
 ]

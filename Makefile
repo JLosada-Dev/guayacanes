@@ -20,14 +20,16 @@ migrate:
 
 # Cargar datos iniciales (fixtures + geodatos)
 data:
-	uv run python manage.py loaddata fixtures/core_services.json
-	uv run python manage.py loaddata fixtures/core_aspects.json
-	uv run python manage.py loaddata fixtures/core_service_content.json
-	uv run python manage.py loaddata fixtures/core_aspect_content.json
+	uv run python manage.py loaddata apps/core/fixtures/sections.json
+	uv run python manage.py loaddata apps/infra_servicios_publicos_urbaser/fixtures/services.json
+	uv run python manage.py loaddata apps/infra_servicios_publicos_urbaser/fixtures/aspects.json
+	uv run python manage.py loaddata apps/infra_servicios_publicos_urbaser/fixtures/service_content.json
+	uv run python manage.py loaddata apps/infra_servicios_publicos_urbaser/fixtures/aspect_content.json
 	uv run python manage.py load_communes
 	uv run python manage.py load_neighborhoods
+	uv run python manage.py load_public_spaces
 	uv run python manage.py load_sweeping
-	uv run python manage.py load_green_zones
+	uv run python manage.py load_green_zone_assignments
 	uv run python manage.py load_cutting_schedule
 
 # Denuncias de prueba para demo

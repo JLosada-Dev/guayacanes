@@ -2,7 +2,9 @@
 Base settings for Guayacanes project.
 """
 
+from datetime import timedelta
 from pathlib import Path
+
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -24,10 +26,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'drf_spectacular',
+    'rest_framework_simplejwt',
     # Local
+    'apps.accounts',
     'apps.core',
+    'apps.geodata',
+    'apps.veeduria',
     'apps.infra_servicios_publicos_urbaser',
-    'apps.infra_servicios_publicos_urbaser_facturacion',
 ]
 
 MIDDLEWARE = [
@@ -78,11 +83,30 @@ MEDIA_ROOT = BASE_DIR / 'media_local'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Evidence uploads (Evidence model). Frontend muestra el límite, pero Django
+# corta antes a nivel de transporte para no aceptar payloads grandes.
+# Límite efectivo en serializer: 5 MB por archivo. Aquí dejamos 6 MB de
+# margen para metadatos multipart (umbral memoria → disco temporal).
+FILE_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
+
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 SPECTACULAR_SETTINGS = {

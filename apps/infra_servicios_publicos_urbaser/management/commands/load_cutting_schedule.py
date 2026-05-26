@@ -12,7 +12,8 @@ Estructura del PDF (febrero 2026):
     Fecha formato: DD-MM-YYYY
     ~290 filas, 9 páginas
 
-El matching GreenZone ↔ PDF es por nombre (fuzzy match con SequenceMatcher),
+El matching GreenZoneAssignment ↔ PDF es por nombre (fuzzy match con
+SequenceMatcher) usando el snapshot public_space_name de la assignment,
 ya que external_id de la BD no corresponde al ID del PDF.
 
 Uso:
@@ -29,7 +30,7 @@ from unicodedata import normalize
 from django.core.management.base import BaseCommand
 
 from apps.infra_servicios_publicos_urbaser.models import (
-    GreenZone,
+    GreenZoneAssignment,
     CuttingSchedule,
 )
 
@@ -106,10 +107,14 @@ class Command(BaseCommand):
                 f'Eliminados {count} schedules existentes.'
             ))
 
-        # Cachear zonas verdes normalizadas para fuzzy match
-        zones = list(GreenZone.objects.all().values('id', 'name'))
-        zones_normalized = {z['id']: _normalize(z['name']) for z in zones}
-        self.stdout.write(f'Zonas verdes en BD: {len(zones)}')
+        # Cachear assignments normalizadas para fuzzy match
+        assignments = list(
+            GreenZoneAssignment.objects.all().values('id', 'public_space_name')
+        )
+        zones_normalized = {
+            a['id']: _normalize(a['public_space_name']) for a in assignments
+        }
+        self.stdout.write(f'Assignments en BD: {len(assignments)}')
 
         # Extraer filas del PDF
         self.stdout.write(f'\nLeyendo PDF: {pdf_path.name}')
@@ -150,7 +155,7 @@ class Command(BaseCommand):
                 continue
 
             # Fuzzy match
-            zone_id, score = _best_match(pdf_name, zones_normalized)
+            assignment_id, score = _best_match(pdf_name, zones_normalized)
             if score < MATCH_THRESHOLD:
                 low_match += 1
                 if options['verbose_match']:
@@ -162,7 +167,7 @@ class Command(BaseCommand):
                 continue
 
             _, is_new = CuttingSchedule.objects.get_or_create(
-                zone_id=zone_id,
+                assignment_id=assignment_id,
                 scheduled_date=scheduled,
                 defaults={
                     'month':    scheduled.month,
