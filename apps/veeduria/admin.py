@@ -1,5 +1,5 @@
 from django.contrib.gis import admin
-from .models import Complaint, Evidence, SLAAlert, MetricByCommune
+from .models import Complaint, ComplaintStatusEvent, Evidence, MetricByCommune, SLAAlert
 
 
 class EvidenceInline(admin.TabularInline):
@@ -13,9 +13,9 @@ class EvidenceInline(admin.TabularInline):
 class ComplaintAdmin(admin.GISModelAdmin):
     list_display    = [
         'id', 'section_slug', 'service_slug', 'aspect_description',
-        'commune_name', 'status', 'location_source', 'created_at',
+        'commune_name', 'status', 'severity', 'location_source', 'created_at',
     ]
-    list_filter     = ['status', 'section_slug', 'service_slug', 'location_source', 'is_rural']
+    list_filter     = ['status', 'severity', 'section_slug', 'service_slug', 'location_source', 'is_rural']
     search_fields   = ['aspect_description', 'commune_name', 'neighborhood_name']
     ordering        = ['-created_at']
     readonly_fields = ['created_at']
@@ -37,7 +37,7 @@ class ComplaintAdmin(admin.GISModelAdmin):
             ]
         }),
         ('Contexto', {
-            'fields': ['description', 'status', 'created_at']
+            'fields': ['description', 'status', 'severity', 'internal_notes', 'created_at']
         }),
     ]
 
@@ -63,6 +63,24 @@ class SLAAlertAdmin(admin.ModelAdmin):
         'extra_data', 'confidence', 'generated_at',
     ]
     search_fields   = ['complaint_id', 'route_label']
+
+    def has_add_permission(self, request):    return False
+    def has_change_permission(self, request, obj=None): return False
+
+
+@admin.register(ComplaintStatusEvent)
+class ComplaintStatusEventAdmin(admin.ModelAdmin):
+    list_display    = [
+        'id', 'complaint', 'from_status', 'to_status',
+        'actor_username', 'actor_role', 'created_at',
+    ]
+    list_filter     = ['actor_role', 'from_status', 'to_status']
+    search_fields   = ['complaint__id', 'actor_username', 'note']
+    ordering        = ['-created_at']
+    readonly_fields = [
+        'complaint', 'actor_user', 'actor_username', 'actor_full_name',
+        'actor_role', 'from_status', 'to_status', 'note', 'created_at',
+    ]
 
     def has_add_permission(self, request):    return False
     def has_change_permission(self, request, obj=None): return False
