@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from django.contrib.gis.geos import Point
 
-from apps.core.models import Commune
+from apps.core.models import Commune, Neighborhood
 from apps.core.registry import all_providers
 from .models import Complaint, Evidence, SLAAlert, MetricByCommune
 
@@ -63,6 +63,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
     section_name       = serializers.CharField(max_length=100, read_only=True)
     service_name       = serializers.CharField(max_length=100, read_only=True)
     aspect_description = serializers.CharField(max_length=200, read_only=True)
+    neighborhood_name  = serializers.CharField(max_length=150, read_only=True)
 
     class Meta:
         model  = Complaint
@@ -73,6 +74,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
             'aspect_slug', 'aspect_description',
             'commune_id', 'commune_name',
             'neighborhood_id', 'neighborhood_name',
+            'address',
             'is_rural', 'hamlet_name',
             'latitude', 'longitude',
             'location_source',
@@ -114,6 +116,23 @@ class ComplaintSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {'commune_id': 'Comuna no encontrada.'}
                 )
+
+        # ── Validar barrio (si viene) y snapshot ──────────────────
+        neighborhood_id = data.get('neighborhood_id')
+        if neighborhood_id:
+            if commune is None:
+                raise serializers.ValidationError(
+                    {'neighborhood_id': 'Requiere commune_id para validar pertenencia.'}
+                )
+            try:
+                neighborhood = Neighborhood.objects.get(
+                    id=neighborhood_id, commune_id=commune.id,
+                )
+            except Neighborhood.DoesNotExist:
+                raise serializers.ValidationError(
+                    {'neighborhood_id': 'No pertenece a la comuna indicada.'}
+                )
+            data['neighborhood_name'] = neighborhood.name
 
         # ── Cascada de coordenada ─────────────────────────────────
         lat = data.pop('latitude', None)

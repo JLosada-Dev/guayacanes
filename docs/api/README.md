@@ -256,6 +256,7 @@ Crea una denuncia ciudadana. Dispara automáticamente el pipeline SLA via signal
 | `neighborhood_name` | string | No | Nombre snapshot del barrio |
 | `is_rural` | boolean | No | `true` si es zona rural |
 | `hamlet_name` | string | No | Nombre de la vereda si `is_rural=true` |
+| `address` | string | No | Dirección textual opcional (máx 300 chars) para refinar la ubicación |
 | `latitude` | float | No* | Latitud GPS (EPSG:4326) |
 | `longitude` | float | No* | Longitud GPS (EPSG:4326) |
 | `location_source` | string | No | `gps` / `manual` / `centroid` |
@@ -278,6 +279,7 @@ Crea una denuncia ciudadana. Dispara automáticamente el pipeline SLA via signal
 2. `aspect_id` se valida contra los aspectos del servicio — debe existir y `active=True`, y pertenecer al servicio
 3. Los campos `service_slug`, `service_name`, `aspect_slug`, `aspect_description` se llenan automáticamente desde el catálogo (snapshot)
 4. `commune_name` se llena automáticamente si solo se envía `commune_id`
+5. Si viene `neighborhood_id`, debe pertenecer a `commune_id`; `neighborhood_name` se llena como snapshot. Si no pertenece → `400`.
 
 **Respuesta 201:**
 ```json

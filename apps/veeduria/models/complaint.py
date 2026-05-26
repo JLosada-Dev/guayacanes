@@ -43,6 +43,10 @@ class Complaint(models.Model):
     commune_name        = models.CharField(max_length=50, blank=True)
     neighborhood_id     = models.IntegerField(null=True, blank=True)
     neighborhood_name   = models.CharField(max_length=150, blank=True)
+    address             = models.CharField(
+        max_length=300, blank=True,
+        help_text='Dirección textual opcional para refinar la ubicación (calle, número, referencia).',
+    )
     is_rural            = models.BooleanField(default=False)
     hamlet_name         = models.CharField(
         max_length=150, blank=True,
@@ -58,6 +62,10 @@ class Complaint(models.Model):
     )
 
     # ── Contexto ─────────────────────────────────────────────────
+    custom_aspect_description = models.CharField(
+        max_length=200, blank=True,
+        help_text='Descripción del problema cuando aspect_slug="other-issue".',
+    )
     description         = models.TextField(blank=True)
     status              = models.CharField(
         max_length=15,
