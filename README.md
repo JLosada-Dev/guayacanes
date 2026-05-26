@@ -90,17 +90,17 @@ python manage.py runserver 0.0.0.0:8000
 
 Copiar `.env.example` a `.env` y completar:
 
-| Variable | Requerida | Default |
-|----------|-----------|---------|
-| `SECRET_KEY` | Sí | — |
-| `DEBUG` | No | `False` |
-| `ALLOWED_HOSTS` | No | `""` |
-| `DB_NAME` | Sí | — |
-| `DB_USER` | Sí | — |
-| `DB_PASSWORD` | Sí | — |
-| `DB_HOST` | No | `localhost` |
-| `DB_PORT` | No | `5432` |
-| `CORS_ALLOWED_ORIGINS` | No | `""` |
+| Variable               | Requerida | Default     |
+| ---------------------- | --------- | ----------- |
+| `SECRET_KEY`           | Sí        | —           |
+| `DEBUG`                | No        | `False`     |
+| `ALLOWED_HOSTS`        | No        | `""`        |
+| `DB_NAME`              | Sí        | —           |
+| `DB_USER`              | Sí        | —           |
+| `DB_PASSWORD`          | Sí        | —           |
+| `DB_HOST`              | No        | `localhost` |
+| `DB_PORT`              | No        | `5432`      |
+| `CORS_ALLOWED_ORIGINS` | No        | `""`        |
 
 ---
 
@@ -143,40 +143,40 @@ Base URL: `http://localhost:8000/api/v1/`
 
 ### Documentación interactiva
 
-| URL | Descripción |
-|-----|-------------|
-| `/api/docs/` | Swagger UI — prueba interactiva |
-| `/api/redoc/` | ReDoc — referencia navegable |
-| `/api/schema/` | OpenAPI 3.0 schema (YAML) |
+| URL            | Descripción                     |
+| -------------- | ------------------------------- |
+| `/api/docs/`   | Swagger UI — prueba interactiva |
+| `/api/redoc/`  | ReDoc — referencia navegable    |
+| `/api/schema/` | OpenAPI 3.0 schema (YAML)       |
 
 Ver referencia conceptual completa en `docs/api/README.md`.
 
 ### Core
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/core/services/` | Servicios activos |
-| GET | `/core/aspects/?service=<slug>` | Aspectos por servicio |
-| GET | `/core/communes/` | 9 comunas de Popayán |
+| Método | Endpoint                        | Descripción           |
+| ------ | ------------------------------- | --------------------- |
+| GET    | `/core/services/`               | Servicios activos     |
+| GET    | `/core/aspects/?service=<slug>` | Aspectos por servicio |
+| GET    | `/core/communes/`               | 9 comunas de Popayán  |
 
 ### Veeduría
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/urbaser/complaints/` | Crear denuncia ciudadana |
-| GET | `/urbaser/complaints/` | Listar denuncias |
-| GET | `/urbaser/complaints/<id>/` | Detalle de denuncia |
-| GET | `/urbaser/complaints/geojson/` | Denuncias como GeoJSON |
-| POST | `/urbaser/evidence/` | Subir foto de evidencia |
+| Método | Endpoint                       | Descripción              |
+| ------ | ------------------------------ | ------------------------ |
+| POST   | `/urbaser/complaints/`         | Crear denuncia ciudadana |
+| GET    | `/urbaser/complaints/`         | Listar denuncias         |
+| GET    | `/urbaser/complaints/<id>/`    | Detalle de denuncia      |
+| GET    | `/urbaser/complaints/geojson/` | Denuncias como GeoJSON   |
+| POST   | `/urbaser/evidence/`           | Subir foto de evidencia  |
 
 ### Auditoría SLA
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/urbaser/alerts/` | Alertas SLA generadas |
-| GET | `/urbaser/alerts/<id>/` | Detalle de alerta |
-| GET | `/urbaser/metrics/` | Métricas heatmap por comuna |
-| GET | `/urbaser/metrics/<id>/` | Detalle de métrica |
+| Método | Endpoint                 | Descripción                 |
+| ------ | ------------------------ | --------------------------- |
+| GET    | `/urbaser/alerts/`       | Alertas SLA generadas       |
+| GET    | `/urbaser/alerts/<id>/`  | Detalle de alerta           |
+| GET    | `/urbaser/metrics/`      | Métricas heatmap por comuna |
+| GET    | `/urbaser/metrics/<id>/` | Detalle de métrica          |
 
 ### Filtros principales
 
@@ -190,12 +190,12 @@ Ver referencia conceptual completa en `docs/api/README.md`.
 
 ## Management commands
 
-| Comando | Descripción | Fuente |
-|---------|-------------|--------|
-| `load_communes` | Carga 9 comunas desde shapefile POT | `U2_COMUNAS.shp` |
-| `load_sweeping` | Carga 8 macrorutas + 1,731 microrutas de barrido | `U18_VIAL.shp` |
+| Comando            | Descripción                                                      | Fuente                        |
+| ------------------ | ---------------------------------------------------------------- | ----------------------------- |
+| `load_communes`    | Carga 9 comunas desde shapefile POT                              | `U2_COMUNAS.shp`              |
+| `load_sweeping`    | Carga 8 macrorutas + 1,731 microrutas de barrido                 | `U18_VIAL.shp`                |
 | `load_green_zones` | Carga 313 zonas verdes (parques, nodos, corredores, separadores) | 5 shapefiles U-19 + SEPARADOR |
-| `seed_complaints` | Genera 14 denuncias de prueba que disparan el pipeline SLA | — |
+| `seed_complaints`  | Genera 14 denuncias de prueba que disparan el pipeline SLA       | —                             |
 
 ```bash
 # Con Make (recomendado)
@@ -242,21 +242,21 @@ git add pyproject.toml uv.lock requirements.txt requirements-dev.txt
 
 ## Documentación
 
-| Documento | Descripción |
-|-----------|-------------|
-| `docs/api/README.md` | Referencia completa de la API v1 — endpoints, filtros, ejemplos, campos choice |
-| `docs/admin-guide.md` | Guía del panel de administración Django |
-| `docs/demo-guide.md` | Guía paso a paso para correr el demo end-to-end |
-| `docs/plan-accion-fase1.md` | Plan de acción Fase 1 — gaps, pendientes, info faltante |
-| `docs/changelog-fase-a.md` | Changelog de la Fase A — endpoints, fixes, Swagger, fixtures |
-| `docs/plan-demo-completo.md` | Plan de demo completo — integración backend + frontend |
-| `docs/frontend-changelog.md` | Changelog granular del frontend (cambios #1-#5 aplicados) |
-| `docs/estado-actual.md` | **Fuente única de verdad** — estado consolidado del proyecto |
-| `docs/estrategia-documentacion.md` | Decisión de dónde vive cada doc (backend vs frontend) |
-| `docs/CONTEXT_GUYACANES.md` | Arquitectura completa, modelos, estado del proyecto |
-| `docs/rutas-y-servicios.md` | Contexto de negocio — rutas PPS 2024, SLA, servicios |
-| `docs/geodatos.md` | Inventario de shapefiles, CRS, comandos de carga |
-| `docs/barrios-opciones.md` | Opciones para cargar barrios (DANE MGN, OSM, Geofabrik) |
-| `docs/guia-dependencias.md` | Setup detallado con uv, GDAL, VS Code |
-| `docs/api/guyacanes.bruno/` | Colección Bruno (recomendada) |
-| `docs/api/guyacanes.postman_collection.json` | Colección Postman |
+| Documento                                    | Descripción                                                                    |
+| -------------------------------------------- | ------------------------------------------------------------------------------ |
+| `docs/api/README.md`                         | Referencia completa de la API v1 — endpoints, filtros, ejemplos, campos choice |
+| `docs/admin-guide.md`                        | Guía del panel de administración Django                                        |
+| `docs/demo-guide.md`                         | Guía paso a paso para correr el demo end-to-end                                |
+| `docs/plan-accion-fase1.md`                  | Plan de acción Fase 1 — gaps, pendientes, info faltante                        |
+| `docs/changelog-fase-a.md`                   | Changelog de la Fase A — endpoints, fixes, Swagger, fixtures                   |
+| `docs/plan-demo-completo.md`                 | Plan de demo completo — integración backend + frontend                         |
+| `docs/frontend-changelog.md`                 | Changelog granular del frontend (cambios #1-#5 aplicados)                      |
+| `docs/estado-actual.md`                      | **Fuente única de verdad** — estado consolidado del proyecto                   |
+| `docs/estrategia-documentacion.md`           | Decisión de dónde vive cada doc (backend vs frontend)                          |
+| `docs/CONTEXT_GUYACANES.md`                  | Arquitectura completa, modelos, estado del proyecto                            |
+| `docs/rutas-y-servicios.md`                  | Contexto de negocio — rutas PPS 2024, SLA, servicios                           |
+| `docs/geodatos.md`                           | Inventario de shapefiles, CRS, comandos de carga                               |
+| `docs/barrios-opciones.md`                   | Opciones para cargar barrios (DANE MGN, OSM, Geofabrik)                        |
+| `docs/guia-dependencias.md`                  | Setup detallado con uv, GDAL, VS Code                                          |
+| `docs/api/guyacanes.bruno/`                  | Colección Bruno (recomendada)                                                  |
+| `docs/api/guyacanes.postman_collection.json` | Colección Postman                                                              |
