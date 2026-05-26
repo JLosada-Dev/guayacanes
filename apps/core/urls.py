@@ -6,7 +6,7 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 
-from .models import Commune, Section
+from .models import Commune, Neighborhood, Section
 from .registry import all_providers, get_provider
 
 
@@ -30,6 +30,12 @@ class CommuneGeoSerializer(GeoFeatureModelSerializer):
         model     = Commune
         geo_field = 'geom'
         fields    = ['id', 'number', 'name', 'area_hectares']
+
+
+class NeighborhoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = Neighborhood
+        fields = ['id', 'name', 'commune_id']
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────
@@ -80,6 +86,7 @@ def services_list(request):
         providers = all_providers()
 
     services = [s for p in providers for s in p.get_services()]
+    services.sort(key=lambda s: (s.order, s.section_slug, s.slug))
     return Response([s.to_dict() for s in services])
 
 
@@ -151,10 +158,54 @@ def communes_geojson(request):
     return Response(serializer.data)
 
 
+@extend_schema(
+    summary='Listar barrios de una comuna',
+    description=(
+        'Retorna los barrios pertenecientes a la comuna indicada por '
+        '`commune_id`. Pensado para alimentar un selector con búsqueda '
+        'aproximada (fuzzy) en el cliente; la respuesta es plana, sin '
+        'geometría y sin paginar (≤60 barrios por comuna).'
+    ),
+    parameters=[
+        OpenApiParameter(
+            name='commune_id',
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.QUERY,
+            description='ID de la comuna (Commune.id, no Commune.number).',
+            required=True,
+        ),
+    ],
+    responses=NeighborhoodSerializer(many=True),
+    tags=['Core / Catálogo'],
+)
+@api_view(['GET'])
+def neighborhoods_list(request):
+    commune_id = request.query_params.get('commune_id')
+    if not commune_id:
+        return Response(
+            {'commune_id': 'Parámetro requerido.'},
+            status=400,
+        )
+    try:
+        commune_id_int = int(commune_id)
+    except (TypeError, ValueError):
+        return Response(
+            {'commune_id': 'Debe ser un entero.'},
+            status=400,
+        )
+    neighborhoods = (
+        Neighborhood.objects
+        .filter(commune_id=commune_id_int)
+        .order_by('name')
+    )
+    return Response(NeighborhoodSerializer(neighborhoods, many=True).data)
+
+
 urlpatterns = [
-    path('sections/',         sections_list,    name='sections-list'),
-    path('services/',         services_list,    name='services-list'),
-    path('aspects/',          aspects_list,     name='aspects-list'),
-    path('communes/',         communes_list,    name='communes-list'),
-    path('communes/geojson/', communes_geojson, name='communes-geojson'),
+    path('sections/',         sections_list,      name='sections-list'),
+    path('services/',         services_list,      name='services-list'),
+    path('aspects/',          aspects_list,       name='aspects-list'),
+    path('communes/',         communes_list,      name='communes-list'),
+    path('communes/geojson/', communes_geojson,   name='communes-geojson'),
+    path('neighborhoods/',    neighborhoods_list, name='neighborhoods-list'),
 ]

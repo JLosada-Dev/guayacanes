@@ -25,6 +25,7 @@ Los tres endpoints se actualizan automáticamente cada vez que se modifica un Vi
 | GET | `/core/services/` | Servicios activos + contenido editorial |
 | GET | `/core/aspects/?service=<slug>` | Aspectos de un servicio |
 | GET | `/core/communes/` | 9 comunas de Popayán con geometría |
+| GET | `/core/neighborhoods/?commune_id=<id>` | Barrios de una comuna (para fuzzy search en cliente) |
 | POST | `/urbaser/complaints/` | Crear denuncia ciudadana |
 | GET | `/urbaser/complaints/` | Listar denuncias (con filtros) |
 | GET | `/urbaser/complaints/{id}/` | Detalle de denuncia |
@@ -188,6 +189,34 @@ Retorna las 9 comunas de Popayán con su geometría en EPSG:4326.
   }
 ]
 ```
+
+---
+
+### GET /api/v1/core/neighborhoods/?commune_id=\<id\>
+
+Lista los barrios de una comuna, ordenados alfabéticamente. Pensado
+para alimentar un selector con búsqueda aproximada (fuzzy) en cliente:
+la respuesta es plana, sin geometría, y no pagina (≤60 barrios por
+comuna).
+
+**Parámetros:**
+
+| Parámetro | Tipo | Requerido | Descripción |
+|-----------|------|-----------|-------------|
+| `commune_id` | integer | Sí | PK de la comuna (`Commune.id`, no `Commune.number`) |
+
+**Respuesta 200:**
+```json
+[
+  { "id": 1,  "name": "Alcalá",  "commune_id": 8 },
+  { "id": 2,  "name": "Antonio Nariño", "commune_id": 8 },
+  { "id": 3,  "name": "Belalcázar", "commune_id": 8 }
+]
+```
+
+**Respuestas de error:**
+- `400` si `commune_id` falta o no es entero.
+- Lista vacía (`[]`) si la comuna existe pero aún no tiene barrios cargados.
 
 ---
 
