@@ -25,10 +25,21 @@ class Complaint(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ('received',     'Recibida'),
-        ('under_review', 'En revisión'),
-        ('closed',       'Cerrada'),
+        ('received',  'Recibida'),
+        ('triaged',   'Caracterizada'),
+        ('in_field',  'En verificación de campo'),
+        ('escalated', 'Escalada a entidad'),
+        ('resolved',  'Resuelta'),
+        ('rejected',  'Rechazada / improcedente'),
     ]
+
+    SEVERITY_CHOICES = [
+        ('low',    'Baja'),
+        ('medium', 'Media'),
+        ('high',   'Alta'),
+    ]
+
+    FINAL_STATUSES = ('resolved', 'rejected')
 
     # ── Qué ──────────────────────────────────────────────────────
     section_slug        = models.CharField(max_length=20, blank=True)
@@ -68,9 +79,18 @@ class Complaint(models.Model):
     )
     description         = models.TextField(blank=True)
     status              = models.CharField(
-        max_length=15,
+        max_length=20,
         choices=STATUS_CHOICES,
         default='received',
+    )
+    severity            = models.CharField(
+        max_length=10,
+        choices=SEVERITY_CHOICES,
+        default='medium',
+    )
+    internal_notes      = models.TextField(
+        blank=True,
+        help_text='Notas internas del veedor/coordinador. No visibles para el ciudadano.',
     )
     created_at          = models.DateTimeField(auto_now_add=True)
 
