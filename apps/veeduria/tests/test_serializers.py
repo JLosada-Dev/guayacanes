@@ -91,3 +91,98 @@ def test_neighborhood_id_without_commune_is_rejected(sweeping_service):
     s = ComplaintSerializer(data=payload)
     assert s.is_valid() is False
     assert 'neighborhood_id' in s.errors
+
+
+@pytest.mark.django_db
+def test_other_aspect_requires_custom_description(commune, sweeping_service):
+    """aspect_slug='other-issue' sin texto custom → 400."""
+    payload = {
+        'service_slug':    sweeping_service.slug,
+        'aspect_slug':     'other-issue',
+        'commune_id':      commune.id,
+        'latitude':        2.47,
+        'longitude':       -76.60,
+        'location_source': 'gps',
+    }
+    s = ComplaintSerializer(data=payload)
+    assert s.is_valid() is False
+    assert 'custom_aspect_description' in s.errors
+
+
+@pytest.mark.django_db
+def test_other_aspect_happy_path_uses_custom_as_snapshot(commune, sweeping_service):
+    """aspect_slug='other-issue' + texto → válido; aspect_description = ese texto."""
+    payload = {
+        'service_slug':              sweeping_service.slug,
+        'aspect_slug':               'other-issue',
+        'custom_aspect_description': 'Pasaron a barrer pero dejaron arena en la cuneta',
+        'commune_id':                commune.id,
+        'address':                   'Calle 5 #12-34',
+        'latitude':                  2.47,
+        'longitude':                 -76.60,
+        'location_source':           'gps',
+    }
+    s = ComplaintSerializer(data=payload)
+    assert s.is_valid(), s.errors
+    assert s.validated_data['custom_aspect_description'] == \
+        'Pasaron a barrer pero dejaron arena en la cuneta'
+    assert s.validated_data['aspect_description'] == \
+        'Pasaron a barrer pero dejaron arena en la cuneta'
+    assert s.validated_data['address'] == 'Calle 5 #12-34'
+
+
+@pytest.mark.django_db
+def test_other_aspect_works_for_any_existing_service(
+    commune, sweeping_service, green_zones_service,
+):
+    """Otros es transversal: válido también para servicios distintos."""
+    for service in (sweeping_service, green_zones_service):
+        payload = {
+            'service_slug':              service.slug,
+            'aspect_slug':               'other-issue',
+            'custom_aspect_description': 'Problema no listado',
+            'commune_id':                commune.id,
+            'latitude':                  2.47,
+            'longitude':                 -76.60,
+            'location_source':           'gps',
+        }
+        s = ComplaintSerializer(data=payload)
+        assert s.is_valid(), (service.slug, s.errors)
+
+
+@pytest.mark.django_db
+def test_normal_aspect_ignores_custom_description(commune, sweeping_service):
+    """Si llega custom_aspect_description con un aspect normal, se fuerza a ''."""
+    aspect = sweeping_service.aspects.first()
+    payload = {
+        'service_slug':              sweeping_service.slug,
+        'aspect_slug':               aspect.slug,
+        'custom_aspect_description': 'esto no debería persistir',
+        'commune_id':                commune.id,
+        'latitude':                  2.47,
+        'longitude':                 -76.60,
+        'location_source':           'gps',
+    }
+    s = ComplaintSerializer(data=payload)
+    assert s.is_valid(), s.errors
+    assert s.validated_data['custom_aspect_description'] == ''
+    # aspect_description sigue siendo el del catálogo, no el texto custom.
+    assert s.validated_data['aspect_description'] == aspect.description
+
+
+@pytest.mark.django_db
+def test_unknown_aspect_for_existing_service_still_rejected(
+    commune, sweeping_service,
+):
+    """Un aspect_slug que no es 'other-issue' y no está en el catálogo → 400."""
+    payload = {
+        'service_slug':    sweeping_service.slug,
+        'aspect_slug':     'made-up-slug',
+        'commune_id':      commune.id,
+        'latitude':        2.47,
+        'longitude':       -76.60,
+        'location_source': 'gps',
+    }
+    s = ComplaintSerializer(data=payload)
+    assert s.is_valid() is False
+    assert 'aspect_slug' in s.errors

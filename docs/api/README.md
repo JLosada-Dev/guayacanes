@@ -257,6 +257,7 @@ Crea una denuncia ciudadana. Dispara automáticamente el pipeline SLA via signal
 | `is_rural` | boolean | No | `true` si es zona rural |
 | `hamlet_name` | string | No | Nombre de la vereda si `is_rural=true` |
 | `address` | string | No | Dirección textual opcional (máx 300 chars) para refinar la ubicación |
+| `custom_aspect_description` | string | Sí si `aspect_slug="other-issue"` | Descripción del problema cuando el ciudadano elige "Otros" al elegir el aspecto. Se ignora para cualquier otro `aspect_slug`. Válido para cualquier `service_slug` del catálogo. |
 | `latitude` | float | No* | Latitud GPS (EPSG:4326) |
 | `longitude` | float | No* | Longitud GPS (EPSG:4326) |
 | `location_source` | string | No | `gps` / `manual` / `centroid` |
@@ -280,6 +281,7 @@ Crea una denuncia ciudadana. Dispara automáticamente el pipeline SLA via signal
 3. Los campos `service_slug`, `service_name`, `aspect_slug`, `aspect_description` se llenan automáticamente desde el catálogo (snapshot)
 4. `commune_name` se llena automáticamente si solo se envía `commune_id`
 5. Si viene `neighborhood_id`, debe pertenecer a `commune_id`; `neighborhood_name` se llena como snapshot. Si no pertenece → `400`.
+6. Si `aspect_slug="other-issue"`, `custom_aspect_description` es obligatorio (no vacío). El aspect es transversal: válido para cualquier `service_slug` real del catálogo. El snapshot `aspect_description` se rellena con el texto custom. Para cualquier otro `aspect_slug`, `custom_aspect_description` se fuerza a `""`.
 
 **Respuesta 201:**
 ```json

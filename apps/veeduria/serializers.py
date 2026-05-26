@@ -3,6 +3,7 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from django.contrib.gis.geos import Point
 
 from apps.core.models import Commune, Neighborhood
+from apps.core.providers import OTHER_ASPECT_SLUG
 from apps.core.registry import all_providers
 from .models import Complaint, Evidence, SLAAlert, MetricByCommune
 
@@ -71,7 +72,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
             'id',
             'section_slug', 'section_name',
             'service_slug', 'service_name',
-            'aspect_slug', 'aspect_description',
+            'aspect_slug', 'aspect_description', 'custom_aspect_description',
             'commune_id', 'commune_name',
             'neighborhood_id', 'neighborhood_name',
             'address',
@@ -98,12 +99,28 @@ class ComplaintSerializer(serializers.ModelSerializer):
         data['service_name'] = service_info.name
 
         # ── Resolver aspecto ──────────────────────────────────────
-        aspect_info = _resolve_aspect(service_slug, aspect_slug)
-        if aspect_info is None or not aspect_info.active:
-            raise serializers.ValidationError(
-                {'aspect_slug': 'Aspecto no encontrado o no pertenece al servicio.'}
-            )
-        data['aspect_description'] = aspect_info.description
+        # "other-issue" es transversal: válido para cualquier servicio sin
+        # estar en el catálogo. El ciudadano describe el problema en
+        # custom_aspect_description y eso pasa a ser el snapshot.
+        custom_aspect = (data.get('custom_aspect_description') or '').strip()
+        if aspect_slug == OTHER_ASPECT_SLUG:
+            if not custom_aspect:
+                raise serializers.ValidationError({
+                    'custom_aspect_description':
+                        'Requerido cuando aspect_slug="other-issue".',
+                })
+            data['custom_aspect_description'] = custom_aspect
+            data['aspect_description']        = custom_aspect
+        else:
+            aspect_info = _resolve_aspect(service_slug, aspect_slug)
+            if aspect_info is None or not aspect_info.active:
+                raise serializers.ValidationError(
+                    {'aspect_slug': 'Aspecto no encontrado o no pertenece al servicio.'}
+                )
+            data['aspect_description']        = aspect_info.description
+            # Evita que un aspect normal arrastre un texto custom: el campo
+            # solo tiene sentido para "other-issue".
+            data['custom_aspect_description'] = ''
 
         # ── Resolver nombre de comuna ─────────────────────────────
         commune_id = data.get('commune_id')

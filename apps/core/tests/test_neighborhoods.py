@@ -1,5 +1,6 @@
 """
-Tests del endpoint /core/neighborhoods/.
+Tests del endpoint /core/neighborhoods/ y de la ausencia de "Otros" como
+servicio (ahora es solo un aspect transversal).
 """
 import pytest
 from rest_framework.test import APIClient
@@ -69,3 +70,15 @@ def test_list_neighborhoods_empty_when_unknown_commune(db):
 
     assert resp.status_code == 200
     assert resp.json() == []
+
+
+@pytest.mark.django_db
+def test_services_listing_does_not_include_other():
+    """
+    "Otros" no es un servicio: vive como aspect transversal aplicable a
+    cualquier servicio. El catálogo de /core/services/ no debe exponerlo.
+    """
+    client = APIClient()
+    services = client.get('/api/v1/core/services/').json()
+    slugs = [s['slug'] for s in services]
+    assert 'other' not in slugs
